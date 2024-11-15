@@ -5,7 +5,7 @@ class KeyTokenService {
     userId,
     publicKey,
   }: {
-    userId: string;
+    userId: any;
     publicKey: string;
   }) => {
     try {
@@ -22,4 +22,4 @@ class KeyTokenService {
   };
 }
 
-export default KeyTokenService;
+export default new KeyTokenService();

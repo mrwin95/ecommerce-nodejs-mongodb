@@ -1,4 +1,6 @@
 import { log } from "console";
+import AccessService from "../services/access.service";
+const accessService = new AccessService();
 
 class AccessController {
   signUp = async (req: any, res: any, next: any) => {
@@ -7,13 +9,9 @@ class AccessController {
       log("[P]::signUp::", req.body);
       //   const { email, password } = req.body;
       //   res.json({ email, password });
-      return res.status(201).json({
-        code: "2001",
-        metadata: {
-          userId: 1,
-        },
-      });
+      return res.status(201).json(await accessService.signUp(req.body));
     } catch (error) {
+      console.error(error);
       next(error);
     }
   };

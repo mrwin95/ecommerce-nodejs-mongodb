@@ -1,5 +1,9 @@
 import shopModel from "../models/shop.model";
 import bcrypt from "bcrypt";
+import { log } from "console";
+import crypto from "crypto";
+import keyTokenService from "./keyToken.service";
+import createTokenPair from "../auth/auth-utils";
 
 const roles = {
   SHOP: "SHOP",
@@ -36,16 +40,86 @@ class AccessService {
       const newShop = await shopModel.create({
         name,
         email,
-        hashedPassword,
+        password: hashedPassword,
         roles: [roles.SHOP],
       });
 
       if (newShop) {
+        //1. create private key and public key
+        //2. save private key in the database
+        //3. send public key to the user
+        //4. return error message
+
+        const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+          modulusLength: 4096,
+          //   publicKeyEncoding: {
+          //     type: "spki",
+          //     format: "pem",
+          //   },
+          //   privateKeyEncoding: {
+          //     type: "pkcs8",
+          //     format: "pem",
+          //   },
+        });
+
+        const publicKeyStringReturn = publicKey
+          .export({
+            type: "spki",
+            format: "pem",
+          })
+          .toString("base64");
+        const privateKeyStringReturn = privateKey
+          .export({
+            type: "spki",
+            format: "pem",
+          })
+          .toString("base64");
+
+        log({ publicKeyStringReturn, privateKey });
+
+        const publicKeyString = await keyTokenService.createToken({
+          userId: newShop._id,
+          publicKey: publicKeyStringReturn,
+        });
+
+        if (!publicKeyString) {
+          return {
+            code: "400",
+            message: "publicKeyString not created",
+            status: "error",
+          };
+        }
+
+        // create a token pair
+
+        const tokens = await createTokenPair.createTokenPair(
+          {
+            userId: newShop._id,
+            email,
+          },
+          publicKeyStringReturn,
+          privateKeyStringReturn
+        );
+
+        log("crate token pair", tokens);
+
+        return {
+          code: "201",
+          metadata: {
+            shop: newShop,
+            tokens,
+          },
+        };
       }
-    } catch (error) {
+
+      return {
+        code: "201",
+        metadata: null,
+      };
+    } catch (error: any) {
       return {
         code: "500",
-        message: "Internal Server Error",
+        message: error.message,
         status: "error",
       };
     }

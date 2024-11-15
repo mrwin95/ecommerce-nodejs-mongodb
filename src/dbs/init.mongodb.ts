@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { countConnect } from "../helpers/check.connect";
 import config from "../configs/mongodb.config";
 
-const connectString = `mongodb://${config.db.host}:${config.db.port}/${config.db.name}`;
+const connectString = `mongodb://${config.db.username}:${config.db.password}@${config.db.host}:${config.db.port}/${config.db.name}?authSource=admin`;
 
 class Database {
   static instance: Database;
