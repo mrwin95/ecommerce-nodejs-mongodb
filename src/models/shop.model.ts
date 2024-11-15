@@ -1,9 +1,9 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 //Define the schema for the shop
 const DOCUMENT_NAME = "Shop";
 const COLLECTION_NAME = "Shops";
-const shopSchema = new mongoose.Schema(
+const shopSchema = new Schema(
   {
     name: {
       type: String,
