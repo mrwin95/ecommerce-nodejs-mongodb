@@ -7,7 +7,7 @@ class KeyTokenService {
   }: {
     userId: any;
     publicKey: string;
-  }) => {
+  }): Promise<string | null> => {
     try {
       const publicKeyString = publicKey.toString();
       const token = await keyTokenModel.create({
@@ -15,9 +15,9 @@ class KeyTokenService {
         publicKey: publicKeyString,
       });
 
-      return token ? publicKeyString : null;
-    } catch (error) {
-      return error;
+      return token ? token.publicKey : null;
+    } catch (error: any) {
+      throw new Error(error);
     }
   };
 }

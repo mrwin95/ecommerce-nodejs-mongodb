@@ -56,34 +56,34 @@ class AccessService {
 
         const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
           modulusLength: 4096,
-          //   publicKeyEncoding: {
-          //     type: "spki",
-          //     format: "pem",
-          //   },
-          //   privateKeyEncoding: {
-          //     type: "pkcs8",
-          //     format: "pem",
-          //   },
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+          },
         });
 
-        const publicKeyStringReturn = publicKey
-          .export({
-            type: "spki",
-            format: "pem",
-          })
-          .toString("base64");
-        const privateKeyStringReturn = privateKey
-          .export({
-            type: "spki",
-            format: "pem",
-          })
-          .toString("base64");
+        // const publicKeyStringReturn = publicKey
+        //   .export({
+        //     type: "spki",
+        //     format: "pem",
+        //   })
+        //   .toString("base64");
+        // const privateKeyStringReturn = privateKey
+        //   .export({
+        //     type: "spki",
+        //     format: "pem",
+        //   })
+        //   .toString("base64");
 
-        log({ publicKeyStringReturn, privateKey });
+        log({ publicKey, privateKey });
 
         const publicKeyString = await this.keyTokenService.createToken({
           userId: newShop._id,
-          publicKey: publicKeyStringReturn,
+          publicKey: publicKey,
         });
 
         if (!publicKeyString) {
@@ -101,8 +101,8 @@ class AccessService {
             userId: newShop._id,
             email,
           },
-          publicKeyStringReturn,
-          privateKeyStringReturn
+          publicKeyString,
+          privateKey
         );
 
         log("crate token pair", tokens);
