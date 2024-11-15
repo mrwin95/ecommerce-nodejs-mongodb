@@ -56,42 +56,33 @@ class AccessService {
         //3. send public key to the user
         //4. return error message
 
-        const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: "spki",
-            format: "pem",
-          },
-          privateKeyEncoding: {
-            type: "pkcs8",
-            format: "pem",
-          },
-        });
-
-        // const publicKeyStringReturn = publicKey
-        //   .export({
+        // const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+        //   modulusLength: 4096,
+        //   publicKeyEncoding: {
         //     type: "spki",
         //     format: "pem",
-        //   })
-        //   .toString("base64");
-        // const privateKeyStringReturn = privateKey
-        //   .export({
-        //     type: "spki",
+        //   },
+        //   privateKeyEncoding: {
+        //     type: "pkcs8",
         //     format: "pem",
-        //   })
-        //   .toString("base64");
+        //   },
+        // }); // this is used for big system
 
-        log({ publicKey, privateKey });
+        const privateKey = crypto.randomBytes(64).toString("hex");
+        const publicKey = crypto.randomBytes(64).toString("hex");
 
-        const publicKeyString = await this.keyTokenService.createToken({
+        // log({ publicKey, privateKey });
+
+        const keyStore = await this.keyTokenService.createToken({
           userId: newShop._id,
-          publicKey: publicKey,
+          publicKey,
+          privateKey,
         });
 
-        if (!publicKeyString) {
+        if (!keyStore) {
           return {
             code: "400",
-            message: "publicKeyString not created",
+            message: "keyStore not created",
             status: "error",
           };
         }
@@ -103,11 +94,11 @@ class AccessService {
             userId: newShop._id,
             email,
           },
-          publicKeyString,
+          publicKey,
           privateKey
         );
 
-        log("crate token pair", tokens);
+        // log("crate token pair", tokens);
 
         return {
           code: "201",

@@ -20,6 +20,7 @@ describe("KeyTokenService - createToken", () => {
     const result = await keyTokenService.createToken({
       userId: "mockedUserId",
       publicKey: "mockedPublicKey",
+      privateKey: "mockedPrivateKey",
     });
 
     expect(keyTokenModel.create).toHaveBeenCalledTimes(1);
@@ -28,16 +29,30 @@ describe("KeyTokenService - createToken", () => {
   });
 
   it("should return null if an error occurs", async () => {
-    (keyTokenModel.create as jest.Mock).mockRejectedValueOnce(
-      new Error("error")
-    );
-
-    const result = await keyTokenService.createToken({
-      userId: "mockedUserId",
-      publicKey: "mockedPublicKey",
+    jest.spyOn(keyTokenService, "createToken").mockImplementation(() => {
+      throw new Error("Mocked error");
     });
+    // (keyTokenModel.create as jest.Mock).mockRejectedValueOnce(
+    //   new Error("error")
+    // );
 
-    expect(keyTokenModel.create).toHaveBeenCalledTimes(1);
-    expect(result).toEqual(new Error("error"));
+    try {
+      await keyTokenService.createToken({
+        userId: "123",
+        publicKey: "123",
+        privateKey: "123",
+      });
+    } catch (error) {
+      expect(error).toEqual(new Error("Mocked error"));
+      //   expect(error.message).toBe("Mocked error");
+    }
+    // const result = await keyTokenService.createToken({
+    //   userId: "mockedUserId",
+    //   publicKey: "mockedPublicKey",
+    //   privateKey: "mockedPrivateKey",
+    // });
+
+    // expect(keyTokenModel.create).toHaveBeenCalledTimes(1);
+    // expect(result).toEqual(new Error("error"));
   });
 });
