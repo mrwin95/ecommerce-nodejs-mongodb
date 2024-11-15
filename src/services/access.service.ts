@@ -4,7 +4,7 @@ import { log } from "console";
 import crypto from "crypto";
 import keyTokenService from "./keyToken.service";
 import createTokenPair from "../auth/auth-utils";
-
+import KeyTokenService from "./keyToken.service";
 const roles = {
   SHOP: "SHOP",
   WRITER: "WRITER", // should be a number
@@ -13,6 +13,10 @@ const roles = {
 };
 
 class AccessService {
+  constructor(public keyTokenService: KeyTokenService) {
+    this.keyTokenService = keyTokenService;
+  }
+
   signUp = async ({
     name,
     email,
@@ -77,7 +81,7 @@ class AccessService {
 
         log({ publicKeyStringReturn, privateKey });
 
-        const publicKeyString = await keyTokenService.createToken({
+        const publicKeyString = await this.keyTokenService.createToken({
           userId: newShop._id,
           publicKey: publicKeyStringReturn,
         });

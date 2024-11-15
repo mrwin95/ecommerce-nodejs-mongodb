@@ -1,7 +1,6 @@
 // unit test for keyToken.service.ts
 import KeyTokenService from "../../../services/keyToken.service";
 import keyTokenModel from "../../../models/keytoken.model";
-import e from "express";
 
 jest.mock("../../../models/keytoken.model");
 

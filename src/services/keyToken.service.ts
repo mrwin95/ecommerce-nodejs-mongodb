@@ -22,4 +22,4 @@ class KeyTokenService {
   };
 }
 
-export default new KeyTokenService();
+export default KeyTokenService;

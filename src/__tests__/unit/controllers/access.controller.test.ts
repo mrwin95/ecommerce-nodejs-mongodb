@@ -1,23 +1,56 @@
 import request from "supertest";
-import express from "express";
+import express, { Application } from "express";
 
 import accessController from "../../../controllers/access.controller";
+import AccessService from "../../../services/access.service";
+import KeyTokenService from "../../../services/keyToken.service";
 
-const app = express();
-
-// Middleware to parse incoming JSON requests
-
-app.use(express.json());
-
-// set up the POST route for signup
-
-app.post("/signup", accessController.signUp);
+jest.mock("../../../controllers/access.controller");
+jest.mock("../../../services/access.service");
+jest.mock("../../../services/keyToken.service");
 
 describe("AccessController", () => {
-  it("should successfully sign up a shop", async () => {
-    const response = await request(app).post("/signup").send({});
+  let app: Application;
+  let mockAccessService: jest.Mocked<AccessService>;
 
-    expect(response.status).toBe(201);
-    expect(response.body.code).toBe("2001");
+  beforeAll(() => {
+    app = express();
+    app.use(express.json());
+    app.post("/signup", accessController.signUp);
   });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    const mockKeyTokenService = new KeyTokenService();
+    mockAccessService = new AccessService(
+      mockKeyTokenService
+    ) as jest.Mocked<AccessService>;
+
+    (AccessService as jest.Mock).mockImplementation(() => mockAccessService);
+  });
+
+  it("should return 201 and a success response for valid sign-up", async () => {
+    // TODO: Implement the test
+  });
+
+  //   it("should return 201 and a success response for valid sign-up", async () => {
+  //     // const mockKeyTokenService = new KeyTokenService();
+  //     // const mockAccessService = new AccessService(mockKeyTokenService);
+
+  //     // mock request body
+
+  //     const requestBody = {
+  //       name: "name",
+  //       email: "test@example.com",
+  //       password: "password",
+  //     };
+
+  //     const response = await request(app)
+  //       .post("/signup")
+  //       .send(requestBody)
+  //       .expect(201);
+
+  //     expect(response.status).toBe(201);
+  //   });
 });

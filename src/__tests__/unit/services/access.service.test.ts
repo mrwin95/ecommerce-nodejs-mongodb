@@ -2,11 +2,14 @@
 import AccessService from "../../../services/access.service";
 import shopModel from "../../../models/shop.model";
 import bcrypt from "bcrypt";
+import KeyTokenService from "../../../services/keyToken.service";
 
 jest.mock("../../../models/shop.model");
+jest.mock("../../../services/keyToken.service");
 jest.mock("bcrypt");
 
-const accessService = new AccessService();
+const mockKeyTokenService = new KeyTokenService();
+const accessService = new AccessService(mockKeyTokenService);
 
 describe("AccessService - Signup", () => {
   beforeEach(() => {
