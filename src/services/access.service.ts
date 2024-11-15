@@ -2,9 +2,11 @@ import shopModel from "../models/shop.model";
 import bcrypt from "bcrypt";
 import { log } from "console";
 import crypto from "crypto";
-import keyTokenService from "./keyToken.service";
+
 import createTokenPair from "../auth/auth-utils";
 import KeyTokenService from "./keyToken.service";
+import { getInfoData } from "../utils";
+
 const roles = {
   SHOP: "SHOP",
   WRITER: "WRITER", // should be a number
@@ -110,7 +112,10 @@ class AccessService {
         return {
           code: "201",
           metadata: {
-            shop: newShop,
+            shop: getInfoData({
+              fields: ["_id", "name", "email"],
+              object: newShop,
+            }),
             tokens,
           },
         };
