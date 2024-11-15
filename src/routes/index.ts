@@ -6,6 +6,7 @@ const router = express.Router();
 
 // apiKey middleware
 router.use(apiKey.apiKey);
+router.use(apiKey.checkPermission("0000"));
 // check Permission middleware
 
 router.use("/api/v1", accessRoutes);
