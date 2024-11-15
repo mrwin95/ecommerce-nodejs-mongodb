@@ -40,4 +40,4 @@ const shopSchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = model(DOCUMENT_NAME, shopSchema);
+export default model(DOCUMENT_NAME, shopSchema);

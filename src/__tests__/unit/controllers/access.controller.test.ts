@@ -1,7 +1,7 @@
 import request from "supertest";
 import express from "express";
 
-import accessController from "../../controllers/access.controller";
+import accessController from "../../../controllers/access.controller";
 
 const app = express();
 

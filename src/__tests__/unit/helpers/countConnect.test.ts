@@ -1,6 +1,6 @@
 // import the function from the file that we want to test
 
-import { countConnect } from "../../helpers/check.connect";
+import { countConnect } from "../../../helpers/check.connect";
 import mongoose from "mongoose";
 
 beforeEach(() => {
