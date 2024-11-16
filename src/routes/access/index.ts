@@ -7,4 +7,7 @@ const router = express.Router();
 // create a route signup
 router.post("/shop/signup", asyncHandler(accessController.signUp));
 
+// create a route signup
+router.post("/shop/login", asyncHandler(accessController.login));
+
 export default router;

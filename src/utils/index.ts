@@ -1,4 +1,5 @@
 import _ from "lodash";
+import crypto from "crypto";
 
 export const getInfoData = ({
   fields = [],
@@ -8,4 +9,9 @@ export const getInfoData = ({
   object: Object;
 }) => {
   return _.pick(object, fields);
+};
+
+export const getRandomBytes = (length: number = 64) => {
+  const str = crypto.randomBytes(length).toString("hex");
+  return str;
 };

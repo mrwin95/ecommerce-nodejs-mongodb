@@ -1,8 +1,17 @@
 import { log } from "console";
 import AccessService from "../services/access.service";
 import KeyTokenService from "../services/keyToken.service";
-import { Created } from "../middlewares/sucess.response";
+import { Created, SuccessResponse } from "../middlewares/sucess.response";
 class AccessController {
+  login = async (req: any, res: any, next: any) => {
+    new SuccessResponse({
+      message: "User logged in successfully",
+      statusCode: 200,
+      reasonStatusCode: "OK",
+      metadata: await new AccessService(new KeyTokenService()).login(req.body),
+    }).send(res);
+  };
+
   signUp = async (req: any, res: any, next: any) => {
     const keyTokenService = new KeyTokenService();
     const accessService = new AccessService(keyTokenService);

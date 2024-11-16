@@ -1,10 +1,11 @@
+import { log } from "console";
 import Jwt from "jsonwebtoken";
 
 const createTokenPair = async (
   payload: {},
   publicKey: string,
   privateKey: string
-) => {
+): Promise<object | any> => {
   try {
     // access Token
     const accessToken = await Jwt.sign(payload, publicKey, {
@@ -16,6 +17,7 @@ const createTokenPair = async (
       expiresIn: "7 days",
     });
 
+    // log(accessToken, refreshToken);
     // verify
 
     Jwt.verify(accessToken, publicKey, (err, decoded) => {

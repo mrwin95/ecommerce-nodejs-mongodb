@@ -1,12 +1,12 @@
 import shopModel from "../models/shop.model";
 import bcrypt from "bcrypt";
-import { log } from "console";
-import crypto from "crypto";
 
 import createTokenPair from "../auth/auth-utils";
 import KeyTokenService from "./keyToken.service";
-import { getInfoData } from "../utils";
+import { getInfoData, getRandomBytes } from "../utils";
 import { BadRequest, NotFound } from "../middlewares/error.response";
+import { findByEmail } from "./shop.service";
+import { log } from "console";
 
 const roles = {
   SHOP: "SHOP",
@@ -19,6 +19,65 @@ class AccessService {
   constructor(public keyTokenService: KeyTokenService) {
     this.keyTokenService = keyTokenService;
   }
+
+  /**
+   *  1. check email is already exist or not
+   * 2. if not exist then create new user (the password should be hashed)
+   * 3. if exist then return error message
+   * 4. create accessToken
+   * 5. create refreshToken
+   * 6. save refreshToken in the database
+   * 7. return accessToken and refreshToken
+   *
+   * @param param0
+   */
+  login = async ({
+    email,
+    password,
+    refreshToken = null,
+  }: {
+    email: string;
+    password: string;
+    refreshToken: string | null;
+  }) => {
+    const foundShop = await findByEmail({ email, select: {} });
+    if (!foundShop) {
+      throw new NotFound("User not found", 404);
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, foundShop.password);
+    if (!isPasswordMatch) {
+      throw new BadRequest("Password does not match", 400);
+    }
+
+    // create a token pair
+    const privateKey = getRandomBytes();
+    const publicKey = getRandomBytes();
+
+    const tokens = await createTokenPair.createTokenPair(
+      {
+        userId: foundShop._id,
+        email,
+      },
+      publicKey,
+      privateKey
+    );
+
+    log("tokens", tokens.refreshToken);
+    await this.keyTokenService.createToken({
+      refreshToken: tokens.refreshToken,
+      privateKey: privateKey,
+      publicKey: publicKey,
+      userId: foundShop._id,
+    });
+    return {
+      shop: getInfoData({
+        fields: ["_id", "name", "email"],
+        object: foundShop,
+      }),
+      tokens,
+    };
+  };
 
   signUp = async ({
     name,
@@ -65,13 +124,14 @@ class AccessService {
       //   },
       // }); // this is used for big system
 
-      const privateKey = crypto.randomBytes(64).toString("hex");
-      const publicKey = crypto.randomBytes(64).toString("hex");
+      const privateKey = getRandomBytes();
+      const publicKey = getRandomBytes();
 
       const keyStore = await this.keyTokenService.createToken({
         userId: newShop._id,
         publicKey,
         privateKey,
+        refreshToken: "",
       });
 
       if (!keyStore) {
