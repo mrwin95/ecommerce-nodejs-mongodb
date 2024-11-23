@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: mongodb
+spec:
+  serviceName: "mongodb-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:5
+          command: ["mongod"]
+          args:
+            - "--replSet=rs0"
+            - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+      initContainers:
+        - name: mongo-init
+          image: mongo:5
+          command:
+            - bash
+            - "-c"
+            - >
+              if [ "$(hostname)" == "mongodb-0" ]; then
+                mongod --replSet rs0 --bind_ip_all --fork --logpath /var/log/mongod.log &&
+                mongo --eval "rs.initiate()"
+              fi
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: mongodb-storage

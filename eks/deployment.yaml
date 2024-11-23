@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecommerce-nodejs
+  labels:
+    app: ecommerce-nodejs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce-nodejs
+  template:
+    metadata:
+      labels:
+        app: ecommerce-nodejs
+    spec:
+      containers:
+        - name: ecommerce-nodejs
+          image: 792248914698.dkr.ecr.ap-northeast-1.amazonaws.com/tutorial/ecommerce-nodejs:25eee8a92e51c916a0b7cb0b232b8d594be0ee5e
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

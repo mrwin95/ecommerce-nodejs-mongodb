@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: mongodb-ns
+  labels:
+    app: mongodb
+spec:
+  serviceName: "mongodb-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      # initContainers:
+      #   - name: init-replicaset
+      #     image: mongo:5
+      #     command:
+      #       - "sh"
+      #       - "-c"
+      #       - |
+      #         echo "Installing nc..."
+      #         apt-get update && apt-get install -y netcat
+      #         echo "Waiting for MongoDB to start..."
+      #         until nc -z -v -w30 mongodb-0.mongodb 27017; do
+      #           echo "Waiting for MongoDB to start..."
+      #           sleep 5
+      #         done
+      #         echo "MongoDB started"
+      #         echo "Configuring replica set..."
+      #         mongosh --host mongodb-0.mongodb:27017 --eval 'rs.initiate()'
+      #     env:
+      #       - name: MONGO_INITDB_ROOT_USERNAME
+      #         value: admin
+      #       - name: MONGO_INITDB_ROOT_PASSWORD
+      #         value: Thang1234
+      containers:
+        - name: mongodb
+          image: mongo:5
+          # command:
+          #   - "mongod"
+          #   - "--replSet"
+          #   - "rs0"
+          #   - "--bind_ip_all"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: mongodb-data
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: ebs-sc
