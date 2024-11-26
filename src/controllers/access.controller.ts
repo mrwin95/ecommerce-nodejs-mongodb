@@ -1,7 +1,7 @@
 import { log } from "console";
 import AccessService from "../services/access.service";
 import KeyTokenService from "../services/keyToken.service";
-import { Created, SuccessResponse } from "../middlewares/sucess.response";
+import { Created, SuccessResponse } from "../middlewares/success.response";
 class AccessController {
   login = async (req: any, res: any, next: any) => {
     new SuccessResponse({
